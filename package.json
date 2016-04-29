@@ -37,6 +37,7 @@
     "chai": "3.5.0",
     "metalsmith-layouts": "1.6.4",
     "nock": "8.0.0",
+    "sinon": "1.17.3",
     "tinyliquid": "0.2.31"
   }
 }

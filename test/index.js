@@ -1,9 +1,12 @@
 import {expect} from 'chai';
+import sinon from 'sinon';
 import nock, {back} from 'nock';
 import shopify from '../src';
 import Metalsmith from 'metalsmith';
 import layouts from 'metalsmith-layouts';
 import path from 'path';
+import config from './config.json';
+import {fetch} from '../src/utils';
 
 describe("metalsmith-shopify", () => {
   
@@ -11,37 +14,46 @@ describe("metalsmith-shopify", () => {
   back.fixtures = __dirname + '/fixtures';
 
   beforeEach(() => {
-    // back('assets.json', (done) => {
-    //   done();
-    // });
-    // nock('https://test.firebaseio.com')
-    //   .get('/home/.json').reply(200, {
-    //     title: 'Home Page'
-    //   });
-    // nock('https://test.firebaseio.com')
-    //   .get('/some/namespace/.json').reply(200, {
-    //     title: 'Some Namespace'
-    //   });
-
     m = Metalsmith('test/fixtures')
         .use(shopify({
           shopName: 'cake-shop-32',
           apiKey: config.apiKey,
           password: config.password,
-          configPath: path.resolve(__dirname, 'fixtures/shopify.json')
+          configPath: path.resolve(__dirname, 'fixtures/shopify.json'),
+          settingsDataPath: path.resolve(__dirname, 'fixtures/settings_data.json')
         }))
         .use(layouts({
           engine: 'liquid',
           directory: 'templates'
         }))
+      nock.recorder.rec();
+  });
+
+  it('should create the correct fetch method', (done) => {
+    let mock = { shop: {get: (...args) => true } };
+    let api = sinon.mock(mock.shop);
+    let file = sinon.spy();
+    let endpoint = 'shop.get';
+    let args = {optionA: 'a', optionB: 'b'};
+    
+    api.expects(endpoint).withArgs(...args);
+    
+    fetch.call(api, endpoint, file, ...args)
+      .then(() => {
+        api.verify();
+        // expect(api.shop.get.called).to.be.true;
+        // expect(api.shop.get.calledWith(...args));
+        expect(file.shop).to.be.defined;
+        expect(file.shop).to.be.a('object');
+        done();
+      });
   });
   
-  it("should have the asset data", (done) => {
+  xit("should have the asset data", (done) => {
     m.build((err, files) => {
       Object.keys(files).map((file) => {
         let meta = files[file];
-        console.log(meta);
-        // expect(meta.assets).to.equal();
+        expect(meta.assets).to.exist;
       });
       done();
     })
