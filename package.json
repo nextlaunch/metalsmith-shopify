@@ -29,6 +29,7 @@
   "homepage": "https://github.com/cameronroe/metalsmith-shopify#readme",
   "dependencies": {
     "axios": "0.10.0",
+    "env2": "2.0.7",
     "lodash": "4.11.1",
     "metalsmith": "2.1.0",
     "q": "1.4.1",

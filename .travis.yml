@@ -5,6 +5,10 @@ cache:
     - node_modules
 notifications:
   email: false
+env:
+  global:
+    - SHOPIFY_KEY=SHOPIFY_KEY
+    - SHOPIFY_PASSWORD=SHOPIFY_PASSWORD
 node_js:
   - '4'
 before_install:

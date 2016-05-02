@@ -5,11 +5,13 @@ import shopify from '../src';
 import Metalsmith from 'metalsmith';
 import layouts from 'metalsmith-layouts';
 import path from 'path';
-import config from './config.json';
+import env2 from 'env2';
 import {fetch} from '../src/utils';
 
+let config = env2('./config.json');
+
 describe("metalsmith-shopify", () => {
-  
+    
   var m, data;
   back.fixtures = __dirname + '/fixtures';
 
@@ -17,8 +19,8 @@ describe("metalsmith-shopify", () => {
     m = Metalsmith('test/fixtures')
         .use(shopify({
           shopName: 'cake-shop-32',
-          apiKey: config.apiKey,
-          password: config.password,
+          apiKey: process.env.SHOPIFY_KEY,
+          password: process.env.SHOPIFY_PASSWORD,
           configPath: path.resolve(__dirname, 'fixtures/shopify.json'),
           settingsDataPath: path.resolve(__dirname, 'fixtures/settings_data.json')
         }))
