@@ -26,37 +26,61 @@ describe("metalsmith-shopify", () => {
           engine: 'liquid',
           directory: 'templates'
         }))
-      nock.recorder.rec();
+      // nock.recorder.rec();
   });
 
-  it('should create the correct fetch method', (done) => {
-    let mock = { shop: {get: (...args) => true } };
-    let api = sinon.mock(mock.shop);
-    let file = sinon.spy();
-    let endpoint = 'shop.get';
-    let args = {optionA: 'a', optionB: 'b'};
+  describe('fetch', () => {
     
-    api.expects(endpoint).withArgs(...args);
+    // here we're testing the fetch method called with
+    // the apiMock context. This context is an object that contains
+    // methods/child-objects that are used as stubs with pre-programmed functionality.
+    // For example the shop.get method should return a promise. When we stub our functionality,
+    // we run the code through our fetch method and test if the shop.get method was called correctly,
+    // meaning that we constructed the method correctly using the provided arguments, called the right methods,
+    // and are building an api in such a way that we expect.
+    let apiMock, shop, get;
+    beforeEach(() => {
+      shop = {
+        get: sinon.stub().returns(Promise.resolve({
+          shop: {}
+        }))
+      };
+      apiMock = { shop };
+    });
+
+    it('should create the correct fetch method', (done) => {
+      let file = sinon.spy();
+      let endpoint = 'shop.get';
+      let args = {optionA: 'a', optionB: 'b'};
+
+      fetch.call(apiMock, endpoint, file, ...args)
+        .then((data) => {
+          expect(shop.get.called).to.be.true;
+          expect(shop.get.calledWith(...args)).to.be.true;
+          expect(data.shop).to.be.defined;
+          done();
+        });
+    });
     
-    fetch.call(api, endpoint, file, ...args)
-      .then(() => {
-        api.verify();
-        // expect(api.shop.get.called).to.be.true;
-        // expect(api.shop.get.calledWith(...args));
-        expect(file.shop).to.be.defined;
-        expect(file.shop).to.be.a('object');
-        done();
-      });
-  });
-  
-  xit("should have the asset data", (done) => {
-    m.build((err, files) => {
-      Object.keys(files).map((file) => {
-        let meta = files[file];
-        expect(meta.assets).to.exist;
-      });
-      done();
-    })
+    xit("should have the shop data", (done) => {
+      let file = sinon.spy();
+      let endpoint = 'shop.get';
+      let args = {optionA: 'a', optionB: 'b'};
+
+      fetch.call(apiMock, endpoint, file, ...args)
+        .then(() => {
+          expect(file.shop).to.be.defined;
+          expect(file.shop).to.be.a('object');
+          done();
+        });
+      // m.build((err, files) => {
+      //   Object.keys(files).map((file) => {
+      //     let meta = files[file];
+      //     expect(meta.assets).to.exist;
+      //   });
+      // })
+    });
+
   });
 
   // it("should load json data into file", (done) => {

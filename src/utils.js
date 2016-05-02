@@ -11,7 +11,7 @@ export function fetch(endpoint, file, args) {
   let method = path[1];
   return this[resource][method](...args)
     .then(resource => {
-      file[resource] = resource;
+      return file[resource] = resource;
     });
 }
 
