@@ -6,7 +6,7 @@ import path from 'path';
 import fs from 'fs';
 import {
   fetch,
-  loadShopify
+  fetchList
 } from './utils';
 
 export default function (options) {
@@ -17,7 +17,7 @@ export default function (options) {
 
     const shopifyConfig = JSON.parse(fs.readFileSync(options.configPath, {encoding: 'utf8'}));
     const settingsData = JSON.parse(fs.readFileSync(options.settingsDataPath, {encoding: 'utf8'}));
-    const api = loadShopify(options);
+    const api = options.api;
     const shopFields = {
       fields: 'id, name, email, domain, city, address1, zip, phone, country'
     };
@@ -40,16 +40,20 @@ export default function (options) {
       }
 
       // Load Shopify API Data
-      fetch.call(api, 'shop.get', file)
-        .then(fetch.call(api, 'pages', file))
-        .then(() => {
-          dfd.resolve(file);
-        })
+      Promise.all([
+        fetch.call(api, 'shop.get', file),
+        fetchList.call(api, 'blog', file)
+      ])
+        .then((data) => {
+          dfd.resolve(data);
+        });
+
     });
 
-    q.allSettled(promises).then((results) => {
-      done();
-    });
+    q.allSettled(promises)
+      .then((results) => {
+        done();
+      });
   }
 }
 

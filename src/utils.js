@@ -9,9 +9,23 @@ export function fetch(endpoint, file, args) {
   let path = endpoint.split('.');
   let resource = path[0];
   let method = path[1];
+  let shopify = file['shopify'] = {};
+  // identify the resource (shop), method (get)
+  // and pass additional options. Return the file.
   return this[resource][method](...args)
-    .then(resource => {
-      return file[resource] = resource;
+    .then(data => {
+      return shopify[resource] = data;
+    });
+}
+
+export function fetchList(resource, file, args) {
+  if (!args) args = {};
+  return this[resource].list(args)
+    .then((data) => {
+      if (!file.shopify) {
+        file.shopify = {};
+      }
+      return file.shopify[resource] = data;
     });
 }
 
