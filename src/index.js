@@ -42,7 +42,9 @@ export default function (options) {
       // Load Shopify API Data
       Promise.all([
         fetch.call(api, 'shop.get', file),
-        fetchList.call(api, 'blog', file)
+        fetchList.call(api, 'blog', file),
+        fetchList.call(api, 'product', file),
+        fetchList.call(api, 'page', file)
       ])
         .then((data) => {
           dfd.resolve(data);

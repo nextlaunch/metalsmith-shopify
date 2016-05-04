@@ -31,7 +31,7 @@ describe("metalsmith-shopify", () => {
   // we run the code through our fetch method and test if the shop.get method was called correctly,
   // meaning that we constructed the method correctly using the provided arguments, called the right methods,
   // and are building an api in such a way that we expect.
-  let apiMock, shop, blog;
+  let apiMock, shop, blog, product, page;
 
   beforeEach(() => {
     shop = {
@@ -45,9 +45,23 @@ describe("metalsmith-shopify", () => {
         { id: '20421134' }
       ]))
     }
+    product = {
+      list: sinon.stub().returns(Promise.resolve([
+        { id: '23408234' }, 
+        { id: '20421134' }
+      ]))
+    }
+    page = {
+      list: sinon.stub().returns(Promise.resolve([
+        { id: '23408234' }, 
+        { id: '20421134' }
+      ])) 
+    }
     apiMock = {
       shop,
-      blog
+      blog,
+      product,
+      page
     };
 
     m = Metalsmith('test/fixtures')
@@ -118,12 +132,26 @@ describe("metalsmith-shopify", () => {
 
     });
 
-    xit('should have article data', (done) => {
+    it('should have product data', (done) => {
       
       m.build((err, files) => {
         for (const file in files) {
-          expect(files[file].shopify.article).to.be.defined;
-          expect(files[file].shopify.article).to.be.an('object');
+          expect(files[file].shopify.product).to.be.defined;
+          expect(files[file].shopify.product).to.be.an('array');
+          expect(files[file].shopify.product[0].id).to.equal('23408234');
+        }
+        done();
+      });
+
+    });
+
+    it('should have page data', (done) => {
+      
+      m.build((err, files) => {
+        for (const file in files) {
+          expect(files[file].shopify.page).to.be.defined;
+          expect(files[file].shopify.page).to.be.an('array');
+          expect(files[file].shopify.page[0].id).to.equal('23408234');
         }
         done();
       });
