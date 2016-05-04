@@ -1,6 +1,5 @@
 import {expect} from 'chai';
 import sinon from 'sinon';
-import nock, {back} from 'nock';
 import shopify from '../src';
 import Metalsmith from 'metalsmith';
 import layouts from 'metalsmith-layouts';
@@ -17,12 +16,17 @@ let config = env2('./config.json');
 describe("metalsmith-shopify", () => {
     
   var m, data;
-  back.fixtures = __dirname + '/fixtures';
-  const api = loadShopify({
-    shopName: 'cake-shop-32',
-    apiKey: process.env.SHOPIFY_KEY,
-    password: process.env.SHOPIFY_PASSWORD,
-  });
+  const shopName = 'cake-shop-32';
+  const apiKey = process.env.SHOPIFY_KEY;
+  const password = process.env.SHOPIFY_PASSWORD;
+
+  const options = {
+    shopName,
+    apiKey,
+    password
+  };
+
+  const api = loadShopify(options);
 
   // here we're testing the fetch method called with
   // the apiMock context. This context is an object that contains
@@ -76,7 +80,7 @@ describe("metalsmith-shopify", () => {
         }))
   });
 
-  describe('fetch', () => {
+  describe('fetch methods', () => {
     
     it('should create the correct fetch method', (done) => {
       let file = sinon.spy();
@@ -105,57 +109,40 @@ describe("metalsmith-shopify", () => {
           done();
         });
     });
-    
+
+  });
+
+  const checkDataObject = (resource, type, done) => {
+    return (err, files) => {
+      expect(err).to.equal(null);
+      for (const file in files) {
+        expect(files[file].shopify[resource]).to.be.defined;
+        expect(files[file].shopify[resource]).to.be.an(type);
+      }
+      done();
+    }
+  };
+
+  describe('data from api', () => {
     
     it("should have shop data", (done) => {
-
-      m.build((err, files) => {
-        for (const file in files) {
-          expect(files[file].shopify.shop).to.be.defined;
-          expect(files[file].shopify.shop).to.be.an('object');
-        }
-        done();
-      });
-
+      m.build(checkDataObject('shop', 'object', done));
     });
 
     it('should have blog data', (done) => {
-
-      m.build((err, files) => {
-        for (const file in files) {
-          expect(files[file].shopify.blog).to.be.defined;
-          expect(files[file].shopify.blog).to.be.an('array');
-          expect(files[file].shopify.blog[0].id).to.equal('23408234');
-        }
-        done();
-      });
-
+      m.build(checkDataObject('blog', 'array', done));
     });
 
     it('should have product data', (done) => {
-      
-      m.build((err, files) => {
-        for (const file in files) {
-          expect(files[file].shopify.product).to.be.defined;
-          expect(files[file].shopify.product).to.be.an('array');
-          expect(files[file].shopify.product[0].id).to.equal('23408234');
-        }
-        done();
-      });
-
+      m.build(checkDataObject('product', 'array', done));
     });
 
     it('should have page data', (done) => {
-      
-      m.build((err, files) => {
-        for (const file in files) {
-          expect(files[file].shopify.page).to.be.defined;
-          expect(files[file].shopify.page).to.be.an('array');
-          expect(files[file].shopify.page[0].id).to.equal('23408234');
-        }
-        done();
-      });
+      m.build(checkDataObject('page', 'array', done));
+    });
 
+    xit('should have ', (done) => {
+      
     });
 
   });

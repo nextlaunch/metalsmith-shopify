@@ -58,23 +58,3 @@ export default function (options) {
       });
   }
 }
-
-// /**
-//  * Fetch
-//  * @param  {string} url
-//  * @return {object} a promise
-//  */
-// function fetch(url) {
-//   var d = q.defer();
-
-//   axios.get(url).then((res) => {
-//     if (res.data) {
-//       d.resolve(res.data);
-//     } else {
-//       d.reject(null);
-//     }
-//   });
-
-//   return d.promise;
-// }
-
