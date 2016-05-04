@@ -41,7 +41,7 @@ export default function (options) {
 
       // Load Shopify API Data
       Promise.all([
-        fetch.call(api, 'shop.get', file),
+        fetch.call(api, 'shop.get', file, shopFields),
         fetchList.call(api, 'blog', file),
         fetchList.call(api, 'product', file),
         fetchList.call(api, 'page', file)
