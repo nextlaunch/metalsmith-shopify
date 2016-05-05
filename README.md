@@ -1,4 +1,4 @@
-# metalsmith-shopify [![npm](https://img.shields.io/npm/v/metalsmith-shopify.svg?maxAge=2592000?style=flat-square)]() [![Travis](https://img.shields.io/travis/cameronroe/metalsmith-shopify.svg?maxAge=2592000?style=flat-square)]() [![Codecov](https://img.shields.io/codecov/c/github/cameronroe/metalsmith-shopify.svg?maxAge=2592000?style=flat-square)]()
+# metalsmith-shopify [![npm](https://img.shields.io/npm/v/metalsmith-shopify.svg?maxAge=2592000?style=flat-square)](https://www.npmjs.com/package/metalsmith-shopify) [![Travis](https://img.shields.io/travis/cameronroe/metalsmith-shopify.svg?maxAge=2592000?style=flat-square)](https://travis-ci.org/cameronroe/metalsmith-shopify) [![Codecov](https://img.shields.io/codecov/c/github/cameronroe/metalsmith-shopify.svg?maxAge=2592000?style=flat-square)](https://codecov.io/gh/cameronroe/metalsmith-shopify)
 
 Why push every change to a server-rendered theme? Cache Shopify data and build themes with Metalsmith.
 
