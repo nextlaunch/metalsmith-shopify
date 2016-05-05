@@ -16,7 +16,9 @@ import {
 
 describe("metalsmith-shopify", () => {
   
-  let config = env2('./config.json');
+  try {
+    let config = env2('./config.json');
+  } catch(e) {}
   const shopName = 'cake-shop-32';
   const apiKey = process.env.SHOPIFY_KEY;
   const password = process.env.SHOPIFY_PASSWORD;
