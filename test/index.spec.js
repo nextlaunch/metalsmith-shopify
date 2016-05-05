@@ -6,14 +6,26 @@ import layouts from 'metalsmith-layouts';
 import path from 'path';
 import dataConfig from '../src/data-config';
 import fs from 'fs';
+import env2 from 'env2';
 import common from './common';
 import * as data from './data';
 import {
+  loadShopify,
   shopifyCallList
 } from '../src/utils';
 
 describe("metalsmith-shopify", () => {
+  
+  let config = env2('./config.json');
+  const shopName = 'cake-shop-32';
+  const apiKey = process.env.SHOPIFY_KEY;
+  const password = process.env.SHOPIFY_PASSWORD;
 
+  const api = loadShopify({
+    shopName,
+    apiKey,
+    password
+  });
   let m, apiMock, conf;
   let themeId = 828155753;
   let blogId = 241253187;
@@ -37,7 +49,9 @@ describe("metalsmith-shopify", () => {
     // set up a new build
     m = Metalsmith('test/fixtures')
         .use(shopify({
-          api: common.api,
+          shopName,
+          apiKey,
+          password,
           settingsDataPath: path.resolve(__dirname, 'fixtures/settings_data.json'),
           themeId,
           blogId,
@@ -50,7 +64,7 @@ describe("metalsmith-shopify", () => {
   });
 
   it('should create correct call list', (done) => {
-    let calls = shopifyCallList(common.api, conf);
+    let calls = shopifyCallList(api, conf);
     let numResources = Object.keys(conf).length;
     expect(calls).to.be.an('array');
     expect(calls.length).to.equal(numResources);

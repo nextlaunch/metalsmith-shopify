@@ -14,12 +14,16 @@ export default function (options) {
   return function (files, metalsmith, next) {
 
     // const shopifyConfig = JSON.parse(fs.readFileSync(options.configPath, {encoding: 'utf8'}));
-    const settingsData = JSON.parse(fs.readFileSync(options.settingsDataPath, {encoding: 'utf8'}));
+    // const settingsData = JSON.parse(fs.readFileSync(options.settingsDataPath, {encoding: 'utf8'}));
     let cache = options.cache;
-    const api = options.api;
     const blogId = options.blogId;
     const themeId = options.themeId;
     const customerId = options.customerId;
+    const api = loadShopify({
+      shopName: options.shopName,
+      apiKey: options.apiKey,
+      password: options.password
+    });
     const endpoints = dataConfig({
       blogId,
       customerId,
@@ -38,6 +42,7 @@ export default function (options) {
         const store = fs.readFileSync('shopify_data.json', 'utf-8');
         assignMetadata(metalsmith, JSON.parse(store), endpoints);
         next();
+        return;
       } else {
         throw new Error('disabled cache');
       }
