@@ -1,6 +1,5 @@
 import Shopify from 'shopify-api-node';
 import q from 'q';
-import prompt from 'prompt-for';
 
 export function loadShopify(options) {
   return new Shopify(options.shopName, options.apiKey, options.password);

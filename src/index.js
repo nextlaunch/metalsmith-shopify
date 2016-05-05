@@ -4,6 +4,7 @@ import q from 'q';
 import path from 'path';
 import fs from 'fs';
 import {
+  loadShopify,
   shopifyCallList
 } from './utils';
 import dataConfig from './data-config';
@@ -12,10 +13,10 @@ export default function (options) {
 
   return function (files, metalsmith, next) {
 
-    const shopifyConfig = JSON.parse(fs.readFileSync(options.configPath, {encoding: 'utf8'}));
+    // const shopifyConfig = JSON.parse(fs.readFileSync(options.configPath, {encoding: 'utf8'}));
     const settingsData = JSON.parse(fs.readFileSync(options.settingsDataPath, {encoding: 'utf8'}));
-    const api = options.api;
     let cache = options.cache;
+    const api = options.api;
     const blogId = options.blogId;
     const themeId = options.themeId;
     const customerId = options.customerId;
@@ -30,18 +31,25 @@ export default function (options) {
     }
 
     try {
+      // if we're actively caching this item,
+      // try to read it from the file and assign it
+      // to our metadata, otherwise, throw a cache disabled error
       if (cache) {
         const store = fs.readFileSync('shopify_data.json', 'utf-8');
-        assignData(metalsmith, JSON.parse(store), endpoints);
+        assignMetadata(metalsmith, JSON.parse(store), endpoints);
         next();
       } else {
         throw new Error('disabled cache');
       }
     } catch (e) {
+      // call all Shopify endpoints as promises
+      // and when they all have resolved:
+      // - assign the metadata
+      // - write a cache store
       const calls = shopifyCallList(api, endpoints);
       q.all(calls)
         .then((d) => {
-          assignData(metalsmith, d, endpoints);
+          assignMetadata(metalsmith, d, endpoints);
           writeStore(metalsmith.metadata().shopify_data, next);
         })
         .catch(err => {
@@ -49,12 +57,11 @@ export default function (options) {
         })
     }
 
-    // let filenames = Object.keys(files);
-
   }
+
 }
 
-function assignData(metalsmith, data, endpoints) {
+function assignMetadata(metalsmith, data, endpoints) {
   let meta = metalsmith.metadata();
   let keys = Object.keys(endpoints);
   meta.shopify_data = data.reduce((memo, val, i) => {
@@ -75,7 +82,6 @@ function writeStore(data, cb) {
     }
   );
 }
-
 
 // function assignFiles(files) {
 //   files.forEach((filename) => {

@@ -48,6 +48,7 @@
     "metalsmith-layouts": "1.6.5",
     "mocha": "2.4.5",
     "nock": "8.0.0",
+    "rewire": "2.5.1",
     "semantic-release": "^4.3.5",
     "sinon": "1.17.4",
     "tinyliquid": "0.2.31"

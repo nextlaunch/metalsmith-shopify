@@ -4,110 +4,44 @@ import shopify from '../src';
 import Metalsmith from 'metalsmith';
 import layouts from 'metalsmith-layouts';
 import path from 'path';
-import env2 from 'env2';
 import dataConfig from '../src/data-config';
 import fs from 'fs';
+import common from './common';
+import * as data from './data';
 import {
-  fetch,
-  fetchList,
-  loadShopify,
   shopifyCallList
 } from '../src/utils';
 
-let config = env2('./config.json');
-
 describe("metalsmith-shopify", () => {
-    
-  var m, data;
-  const shopName = 'cake-shop-32';
-  const apiKey = process.env.SHOPIFY_KEY;
-  const password = process.env.SHOPIFY_PASSWORD;
 
-  const options = {
-    shopName,
-    apiKey,
-    password
-  };
-
-  const api = loadShopify(options);
-
-  // here we're testing the fetch method called with
-  // the apiMock context. This context is an object that contains
-  // methods/child-objects that are used as stubs with pre-programmed functionality.
-  // For example the shop.get method should return a promise. When we stub our functionality,
-  // we run the code through our fetch method and test if the shop.get method was called correctly,
-  // meaning that we constructed the method correctly using the provided arguments, called the right methods,
-  // and are building an api in such a way that we expect.
-  let apiMock, shop, blog, product, page, article, asset, theme;
-  let themeId = '2342340';
-  let blogId = 3939025;
-  let customerId = '2342340';
+  let m, apiMock, conf;
+  let themeId = 828155753;
+  let blogId = 241253187;
+  let customerId = 207119551;
 
   before(() => {
+    // remove any cache json files
     try {
       fs.unlinkSync('shopify_data.json');
     } catch (e) {}
+
+    conf = dataConfig({
+      blogId,
+      customerId,
+      themeId
+    });
+
   });
 
   beforeEach(() => {
-    shop = {
-      get: sinon.stub(api.shop, 'get').returns(Promise.resolve({shop: {}}))
-    }
-    blog = {
-      list: sinon.stub().returns(Promise.resolve([
-        { id: '23408234' }, 
-        { id: '20421134' }
-      ]))
-    }
-    product = {
-      list: sinon.stub().returns(Promise.resolve([
-        { id: '23408234' }, 
-        { id: '20421134' }
-      ]))
-    }
-    page = {
-      list: sinon.stub().returns(Promise.resolve([
-        { id: '23408234' }, 
-        { id: '20421134' }
-      ])) 
-    }
-    article = {
-      list: sinon.stub().returns(Promise.resolve([
-          { id: '23408234' }, 
-          { id: '20421134' }
-        ])) 
-    }
-    asset = {
-      list: sinon.stub(api.asset, 'list')
-        .withArgs(themeId)
-        .returns(Promise.resolve([
-          { id: '23408234' }, 
-          { id: '20421134' }
-        ]))
-    }
-    theme = {
-      list: sinon.stub(api.theme, 'list')
-        .returns(Promise.resolve([
-          { id: '23408234' }, 
-          { id: '20421134' }
-        ]))
-    }
-    apiMock = {
-      shop,
-      blog,
-      product,
-      page,
-      article,
-      asset,
-      theme
-    };
-
+    // set up a new build
     m = Metalsmith('test/fixtures')
         .use(shopify({
-          api: apiMock,
-          configPath: path.resolve(__dirname, 'fixtures/shopify.json'),
+          api: common.api,
           settingsDataPath: path.resolve(__dirname, 'fixtures/settings_data.json'),
-          themeId
+          themeId,
+          blogId,
+          customerId
         }))
         .use(layouts({
           engine: 'liquid',
@@ -115,125 +49,72 @@ describe("metalsmith-shopify", () => {
         }))
   });
 
-  afterEach(() => {
-    api.shop.get.restore();
-    api.asset.list.restore();
-    api.theme.list.restore();
-  })
-
-  describe('fetch methods', () => {
-
-    let conf;
-    beforeEach(() => {
-      conf = dataConfig({
-        blogId,
-        customerId,
-        themeId
-      });
-    })
-
-    xit('should create the correct fetch method', (done) => {
-      let file = sinon.spy();
-      let endpoint = 'shop.get';
-      let args = {optionA: 'a', optionB: 'b'};
-
-      fetch.call(apiMock, endpoint, file, ...args)
-        .then((data) => {
-          expect(shop.get.called).to.be.true;
-          expect(shop.get.calledWith(...args)).to.be.true;
-          expect(data.shop).to.be.defined;
-          done();
-        });
-    });
-
-    xit('should create the correct fetchList method', (done) => {
-      let file = sinon.spy();
-      let resource = 'blog';
-      let args = {optionA: 'a', optionB: 'b'};
-
-      fetchList.call(apiMock, resource, file, ...args)
-        .then((data) => {
-          expect(blog.list.called).to.be.true;
-          expect(blog.list.calledWith(...args)).to.be.true;
-          expect(file.shopify.blog).to.be.an('array');
-          done();
-        });
-    });
-
-    it('should create correct call list', (done) => {
-      let calls = shopifyCallList(api, conf);
-      let numResources = Object.keys(conf).length;
-      expect(calls).to.be.an('array');
-      expect(calls.length).to.equal(numResources);
-      done();
-    });
-
+  it('should create correct call list', (done) => {
+    let calls = shopifyCallList(common.api, conf);
+    let numResources = Object.keys(conf).length;
+    expect(calls).to.be.an('array');
+    expect(calls.length).to.equal(numResources);
+    done();
   });
 
-  const checkDataObject = (resource, done) => {
+  const checkDataObject = (resource, output, done) => {
     return (err, files) => {
       expect(err).to.equal(null);
       let resources = m.metadata().shopify_data;
       expect(resources[resource]).to.be.ok;
+      expect(resources[resource]).to.deep.equal(output);
       done();
     }
   };
 
   describe('data from api', () => {
+    
+    let scope = common.scope;
+
+    afterEach(() => expect(scope.isDone()).to.be.true);
 
     it('should add shopify object to global metadata', (done) => {
+      scope
+        .get('/admin/shop.json?fields=id%2C%20name%2C%20email%2C%20domain%2C%20city%2C%20address1%2C%20zip%2C%20phone%2C%20country')
+        .reply(200, data.shop.res.get)
+        .get('/admin/blogs.json')
+        .reply(200, data.blog.res.list)
+        .get('/admin/blogs/241253187/articles.json')
+        .reply(200, data.article.res.list)
+        .get('/admin/products.json')
+        .reply(200, data.product.res.list)
+        .get('/admin/pages.json')
+        .reply(200, data.page.res.list)
+        .get('/admin/themes/828155753/assets.json')
+        .reply(200, data.asset.res.list)
+        .get('/admin/themes.json')
+        .reply(200, data.theme.res.list)
+        .get('/admin/policies.json')
+        .reply(200, data.policy.res.list)
+        .get('/admin/script_tags.json')
+        .reply(200, data.script_tag.res.list)
+        .get('/admin/checkouts.json')
+        .reply(200, data.checkout.res.list)
+        .get('/admin/collects.json')
+        .reply(200, data.collect.res.list)
+        .get('/admin/comments.json')
+        .reply(200, data.comment.res.list)
+        .get('/admin/countries.json')
+        .reply(200, data.country.res.list)
+        .get('/admin/customers.json')
+        .reply(200, data.customer.res.list)
+        .get('/admin/customers/207119551/addresses.json')
+        .reply(200, data.customerAddress.res.list)
+        .get('/admin/events.json')
+        .reply(200, data.event.res.list)
+        .get('/admin/metafields.json')
+        .reply(200, data.metafield.res.list)
+        .get('/admin/orders.json')
+        .reply(200, data.order.res.list)
+
       m.build((err, files) => {
         expect(m.metadata().shopify_data).to.be.ok;
         done();
-      });
-    });
-
-    it("should have shop data", (done) => {
-      m.build(checkDataObject('shop', done));
-    });
-
-    it('should have blog data', (done) => {
-      m.build(checkDataObject('blog', done));
-    });
-
-    it('should have product data', (done) => {
-      m.build(checkDataObject('product', done));
-    });
-
-    it('should have page data', (done) => {
-      m.build(checkDataObject('page', done));
-    });
-
-    it('should have article data', (done) => {
-      m.build(checkDataObject('article', done));
-    });
-
-    it('should have asset data', (done) => {
-      m.build(checkDataObject('asset', done));
-    });
-
-    it('should have theme data', (done) => {
-      m.build(checkDataObject('theme', done));
-    });
-
-  });
-
-  xdescribe('with caching', () => {
-
-    it('should not fetch twice', (done) => {
-      let deleted = fs.unlinkSync('shopify_data.json');
-
-      m.build((err, files) => {
-        expect(api.shop.get.called).to.be.true;
-        expect(api.shop.get.returnValues[0]).to.equal(true);
-        expect(m.metadata().shopify_data).to.be.defined;
-        
-        m.build((err, files) => {
-          expect(api.shop.get.returnValues[0]).to.equal(false);
-          expect(m.metadata().shopify_data).to.be.defined;
-          done();
-        });
-
       });
     });
 
@@ -241,7 +122,7 @@ describe("metalsmith-shopify", () => {
 
   xdescribe('with caching disabled', () => {
     
-    let m;   
+    let m, api = common.api;
     beforeEach(() => {
 
       sinon.stub(api.shop, 'get').returns(Promise.resolve([

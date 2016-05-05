@@ -19,50 +19,54 @@ export default function (options) {
       method: 'list',
       params: [themeId]
     },
-    // checkout: {
-    //   method: 'list',
-    //   params: []
-    // },
-    // collect: {
-    //   method: 'list',
-    //   params: []
-    // },
-    // comment: {
-    //   method: 'list',
-    //   params: []
-    // },
-    // country: {
-    //   method: 'list',
-    //   params: []
-    // },
-    // customer: {
-    //   method: 'list',
-    //   params: []
-    // },
-    // customerAddress: {
-    //   method: 'list',
-    //   params: [customerId]
-    // },
-    // event: {
-    //   method: 'list',
-    //   params: []
-    // },
-    // metafield: {
-    //   method: 'list',
-    //   params: []
-    // },
-    // order: {
-    //   method: 'list',
-    //   params: []
-    // },
+    checkout: {
+      method: 'list',
+      params: []
+    },
+    collect: {
+      method: 'list',
+      params: []
+    },
+    comment: {
+      method: 'list',
+      params: []
+    },
+    country: {
+      method: 'list',
+      params: []
+    },
+    customer: {
+      method: 'list',
+      params: []
+    },
+    customerAddress: {
+      method: 'list',
+      params: [customerId]
+    },
+    event: {
+      method: 'list',
+      params: []
+    },
+    metafield: {
+      method: 'list',
+      params: []
+    },
+    order: {
+      method: 'list',
+      params: []
+    },
     page: {
       method: 'list',
       params: []
     },
-    // policy: {
-    //   method: 'list',
-    //   params: []
-    // },
+    scriptTag: {
+      method: 'list',
+      params: []
+    },
+    policy: {
+      method: 'list',
+      params: []
+    },
     product: {
       method: 'list',
       params: []
