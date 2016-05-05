@@ -59,7 +59,7 @@ export default function (options) {
         })
         .catch(err => {
           console.log(err);
-        })
+        });
     }
 
   }
@@ -69,11 +69,18 @@ export default function (options) {
 function assignMetadata(metalsmith, data, endpoints) {
   let meta = metalsmith.metadata();
   let keys = Object.keys(endpoints);
-  meta.shopify_data = data.reduce((memo, val, i) => {
-    let resource = {};
-    memo[keys[i]] = val;
-    return memo;
-  }, {});
+  if (!Array.isArray(data)) {
+    for (const k in data) {
+      if (!meta.shopify_data) meta.shopify_data = {};
+      meta.shopify_data[k] = data[k];
+    }
+  } else {
+    meta.shopify_data = data.reduce((memo, val, i) => {
+      let resource = {};
+      memo[keys[i]] = val;
+      return memo;
+    }, {});
+  }
   return meta;
 }
 
