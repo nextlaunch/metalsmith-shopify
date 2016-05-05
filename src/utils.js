@@ -1,4 +1,6 @@
 import Shopify from 'shopify-api-node';
+import q from 'q';
+import prompt from 'prompt-for';
 
 export function loadShopify(options) {
   return new Shopify(options.shopName, options.apiKey, options.password);
@@ -20,7 +22,7 @@ export function fetch(endpoint, file, args) {
 
 export function fetchList(resource, file, args) {
   if (!args) args = {};
-  return this[resource].list(args)
+  return this[resource].list(...args)
     .then((data) => {
       if (!file.shopify) {
         file.shopify = {};
@@ -29,19 +31,15 @@ export function fetchList(resource, file, args) {
     });
 }
 
-// api.asset.list(61402885)
-//   .then(assets => {
-//     for (let asset of assets) {
-//       if (asset.public_url) {
-//         axios.get(asset.public_url)
-//           .then(data => {
-//             file.shopify_data = data;
-//             console.log(file.shopify_data);
-//             dfd.resolve(data);
-//           })
-//           .catch(err => {
-//             console.log(err);
-//           });
-//       }
-//     }
-//   });
+export function shopifyCallList(api, endpoints) {
+  let calls = [];
+  let index = 0;
+  for (const resource in endpoints) {
+    let { method, params } = endpoints[resource];
+    calls.push(
+      api[resource][method](...params)
+    )
+  }
+
+  return calls;
+}

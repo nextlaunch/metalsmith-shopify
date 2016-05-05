@@ -1,60 +1,95 @@
 import Metalsmith from 'metalsmith';
-import axios from 'axios';
 import _ from 'lodash';
 import q from 'q';
 import path from 'path';
 import fs from 'fs';
 import {
-  fetch,
-  fetchList
+  shopifyCallList
 } from './utils';
+import dataConfig from './data-config';
 
 export default function (options) {
 
-  return function (files, metalsmith, done) {
-    var data = {};
-    var promises = []; // and they still feel all so wasted on myself..
+  return function (files, metalsmith, next) {
 
     const shopifyConfig = JSON.parse(fs.readFileSync(options.configPath, {encoding: 'utf8'}));
     const settingsData = JSON.parse(fs.readFileSync(options.settingsDataPath, {encoding: 'utf8'}));
     const api = options.api;
-    const shopFields = {
-      fields: 'id, name, email, domain, city, address1, zip, phone, country'
-    };
-
-    Object.keys(files).forEach((filename) => {
-      var file = files[filename];
-      var dfd = q.defer();
-        
-      file = Object.assign(
-        file,
-        shopifyConfig,
-        {settings: settingsData.current}
-      );
-
-      file.content_for_layout = file.contents;
-
-      if (file.shopify) {
-        // make a promise
-        promises.push(dfd.promise);
-      }
-
-      // Load Shopify API Data
-      Promise.all([
-        fetch.call(api, 'shop.get', file, shopFields),
-        fetchList.call(api, 'blog', file),
-        fetchList.call(api, 'product', file),
-        fetchList.call(api, 'page', file)
-      ])
-        .then((data) => {
-          dfd.resolve(data);
-        });
-
+    let cache = options.cache;
+    const blogId = options.blogId;
+    const themeId = options.themeId;
+    const customerId = options.customerId;
+    const endpoints = dataConfig({
+      blogId,
+      customerId,
+      themeId
     });
 
-    q.allSettled(promises)
-      .then((results) => {
-        done();
-      });
+    if (typeof cache === 'undefined') {
+      cache = true;
+    }
+
+    try {
+      if (cache) {
+        const store = fs.readFileSync('shopify_data.json', 'utf-8');
+        assignData(metalsmith, JSON.parse(store), endpoints);
+        next();
+      } else {
+        throw new Error('disabled cache');
+      }
+    } catch (e) {
+      const calls = shopifyCallList(api, endpoints);
+      q.all(calls)
+        .then((d) => {
+          assignData(metalsmith, d, endpoints);
+          writeStore(metalsmith.metadata().shopify_data, next);
+        })
+        .catch(err => {
+          console.log(err);
+        })
+    }
+
+    // let filenames = Object.keys(files);
+
   }
 }
+
+function assignData(metalsmith, data, endpoints) {
+  let meta = metalsmith.metadata();
+  let keys = Object.keys(endpoints);
+  meta.shopify_data = data.reduce((memo, val, i) => {
+    let resource = {};
+    memo[keys[i]] = val;
+    return memo;
+  }, {});
+  return meta;
+}
+
+function writeStore(data, cb) {
+  fs.writeFile(
+    'shopify_data.json',
+    JSON.stringify(data), 
+    (err) => {
+      if (err) throw err;
+      cb(null);
+    }
+  );
+}
+
+
+// function assignFiles(files) {
+//   files.forEach((filename) => {
+//     var file = files[filename];
+//     var dfd = q.defer();
+      
+//     // file = Object.assign(
+//     //   file,
+//     //   shopifyConfig,
+//     //   {settings: settingsData.current}
+//     // );
+
+//     // file.content_for_layout = file.contents;
+
+
+//   });
+// }
