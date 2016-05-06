@@ -5,11 +5,10 @@
   "scripts": {
     "test": "mocha --compilers js:babel-register",
     "test:watch": "mocha --compilers js:babel-register -w",
-    "build": "rm -rf ./dist && babel src -d dist",
+    "build": "rimraf ./dist && babel src -d dist",
     "check-coverage": "./node_modules/.bin/babel-node ./node_modules/.bin/istanbul check-coverage --statements 100 --branches 100 --functions 100 --lines 100",
     "cover": "./node_modules/.bin/babel-node ./node_modules/.bin/istanbul cover -x *.spec.js ./node_modules/.bin/_mocha -- test/index.spec.js -R spec --recursive --compilers js:babel-register",
     "report-coverage": "./node_modules/.bin/codecov -t a5a0a03e-6504-45d1-8eba-54ee0c290fce",
-    "prepublish": "npm run build",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post"
   },
   "repository": {
@@ -21,6 +20,10 @@
       "es2015"
     ]
   },
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "author": "Cameron Roe <cameronjroe@gmail.com> (http://cameronroe.com)",
   "license": "MIT",
   "bugs": {
@@ -47,6 +50,7 @@
     "mocha": "2.4.5",
     "nock": "8.0.0",
     "rewire": "2.5.1",
+    "rimraf": "2.5.2",
     "semantic-release": "^4.3.5",
     "sinon": "1.17.4",
     "tinyliquid": "0.2.31"
