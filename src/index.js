@@ -9,6 +9,39 @@ import {
 } from './utils';
 import dataConfig from './data-config';
 
+export const tags = {};
+
+export function assignFilters(config, metalsmith) {
+  
+  // create some filters for Shopify
+  let filters = {
+    t: function (str) {
+      let locale = config.locale;
+      let translationPath = path.join(config.localePath, `${config.locale}.json`);
+      let translations = fs.readFileSync(translationPath, 'utf-8');
+      let allTranslationsData = JSON.parse(translations);
+      let obj;
+      if (Array.isArray(allTranslationsData)) {
+        obj = allTranslationsData[0];
+      } else {
+        obj = allTranslationsData;
+      }
+
+      if (str.indexOf('.') > 0) {
+        return str.split('.').reduce((memo, item, i) => {
+          return memo = memo[item];
+        }, obj);
+      }
+    }
+  };
+
+  // assign filters for metalsmith-layouts
+  let meta = metalsmith.metadata();
+  meta.filters = filters;
+
+  return filters;
+};
+
 export default function (options) {
 
   return function (files, metalsmith, next) {
@@ -33,6 +66,12 @@ export default function (options) {
     if (typeof cache === 'undefined') {
       cache = true;
     }
+
+    let localeConfig = {
+      locale: 'en.default',
+      localePath: options.localePath
+    };
+    // assignFilters(config, metalsmith);
 
     try {
       // if we're actively caching this item,
