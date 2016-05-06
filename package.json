@@ -4,11 +4,11 @@
   "main": "dist/index.js",
   "scripts": {
     "test": "mocha --compilers js:babel-register",
-    "test:watch": "mocha --compilers js:babel-register -w",
+    "test:watch": "npm t -- -w",
     "build": "rimraf ./dist && babel src -d dist",
-    "check-coverage": "./node_modules/.bin/babel-node ./node_modules/.bin/istanbul check-coverage --statements 100 --branches 100 --functions 100 --lines 100",
-    "cover": "./node_modules/.bin/babel-node ./node_modules/.bin/istanbul cover -x *.spec.js ./node_modules/.bin/_mocha -- test/index.spec.js -R spec --recursive --compilers js:babel-register",
-    "report-coverage": "./node_modules/.bin/codecov -t a5a0a03e-6504-45d1-8eba-54ee0c290fce",
+    "check-coverage": "nyc check-coverage --statements 100 --branches 100 --functions 100 --lines 100",
+    "cover": "nyc npm t",
+    "report-coverage": "codecov -t a5a0a03e-6504-45d1-8eba-54ee0c290fce",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post"
   },
   "repository": {
@@ -45,10 +45,10 @@
     "babel-preset-stage-0": "6.5.0",
     "babel-register": "6.8.0",
     "chai": "3.5.0",
-    "istanbul": "1.0.0-alpha.2",
     "metalsmith-layouts": "1.6.5",
     "mocha": "2.4.5",
     "nock": "8.0.0",
+    "nyc": "6.4.3",
     "rewire": "2.5.1",
     "rimraf": "2.5.2",
     "semantic-release": "^4.3.5",
