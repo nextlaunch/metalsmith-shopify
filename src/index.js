@@ -12,7 +12,6 @@ import dataConfig from './data-config';
 export const tags = {};
 
 export function assignFilters(config, metalsmith) {
-  
   // create some filters for Shopify
   let filters = {
     t: function (str) {
@@ -28,6 +27,7 @@ export function assignFilters(config, metalsmith) {
       }
 
       if (str.indexOf('.') > 0) {
+        // reduce the translations to find the correct object
         return str.split('.').reduce((memo, item, i) => {
           return memo = memo[item];
         }, obj);
@@ -42,6 +42,7 @@ export function assignFilters(config, metalsmith) {
   return filters;
 };
 
+// Metalsmith plugin
 export default function (options) {
 
   return function (files, metalsmith, next) {
@@ -52,11 +53,13 @@ export default function (options) {
     const blogId = options.blogId;
     const themeId = options.themeId;
     const customerId = options.customerId;
+    // configure the api for Shopify
     const api = loadShopify({
       shopName: options.shopName,
       apiKey: options.apiKey,
       password: options.password
     });
+    // get the endpoints for the api calls
     const endpoints = dataConfig({
       blogId,
       customerId,
@@ -71,7 +74,7 @@ export default function (options) {
       locale: 'en.default',
       localePath: options.localePath
     };
-    // assignFilters(config, metalsmith);
+    assignFilters(localeConfig, metalsmith);
 
     try {
       // if we're actively caching this item,
