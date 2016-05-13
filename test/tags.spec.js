@@ -108,10 +108,10 @@ describe('URL Filters', () => {
 
   });
 
-
-  it('should have stylesheet_tag filter', (done) => {
+  xit('should have img_tag filter', (done) => {
     
-    let str = 'timber.scss.css';
+    let str = 'red_shirt_small.jpg';
+    const args = ['alternate text', 'css-class'];
     let filters;
     m.use((files, metalsmith, next) => {
 
@@ -122,8 +122,8 @@ describe('URL Filters', () => {
         }, metalsmith);
 
         expect(filters.asset_url).to.be.ok;
-        let data = filters.stylesheet_tag(filters.asset_url(str));
-        expect(data).to.equal('<link href="https://cdn.shopify.com/s/files/1/0354/1849/t/2/assets/timber.scss.css" rel="stylesheet" type="text/css" media="all" />');
+        let data = filters.img_tag(filters.asset_url(str, args));
+        expect(data).to.equal('<img src="//cdn.shopify.com/s/files/1/0159/3350/products/red_shirt_small.jpg?v=1398706734" alt="Red Shirt Small" />');
 
         next();
       })
