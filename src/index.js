@@ -16,6 +16,9 @@ export function assignFilters(config, metalsmith) {
   let filters = {
     t: function (str) {
       let locale = config.locale;
+      if (!config.localePath) {
+        throw new Error('did not specify options.localePath');
+      }
       let translationPath = path.join(config.localePath, `${config.locale}.json`);
       let translations = fs.readFileSync(translationPath, 'utf-8');
       let allTranslationsData = JSON.parse(translations);
@@ -32,6 +35,9 @@ export function assignFilters(config, metalsmith) {
           return memo = memo[item];
         }, obj);
       }
+    },
+    asset_url: function (str) {
+      return `https://cdn.shopify.com/s/files/1/0354/1849/t/2/assets/${str}`;
     }
   };
 
