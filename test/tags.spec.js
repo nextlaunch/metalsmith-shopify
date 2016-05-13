@@ -15,10 +15,6 @@ describe('translate tag', () => {
     m = Metalsmith('test/fixtures');
   });
 
-  afterEach(() => {
-    mock.restore();
-  });
-
   it('should accept a string and return the right object from an array object source', (done) => {
     let str = 'nested.obj.data';
     let filters;
@@ -110,6 +106,33 @@ describe('URL Filters', () => {
       }))
       .build(done);
 
+  });
+
+
+  it('should have stylesheet_tag filter', (done) => {
+    
+    let str = 'timber.scss.css';
+    let filters;
+    m.use((files, metalsmith, next) => {
+
+        let localePath = path.resolve('test/fixtures/locales');
+        filters = assignFilters({
+          locale: 'en.default.obj',
+          localePath
+        }, metalsmith);
+
+        expect(filters.asset_url).to.be.ok;
+        let data = filters.stylesheet_tag(filters.asset_url(str));
+        expect(data).to.equal('<link href="https://cdn.shopify.com/s/files/1/0354/1849/t/2/assets/timber.scss.css" rel="stylesheet" type="text/css" media="all" />');
+
+        next();
+      })
+      .use(layouts({
+        engine: 'liquid',
+        directory: 'templates'
+      }))
+      .build(done);
+    
   });
 
 });

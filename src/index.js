@@ -38,6 +38,9 @@ export function assignFilters(config, metalsmith) {
     },
     asset_url: function (str) {
       return `https://cdn.shopify.com/s/files/1/0354/1849/t/2/assets/${str}`;
+    },
+    stylesheet_tag: function (str) {
+      return `<link href="${str}" rel="stylesheet" type="text/css" media="all" />`;
     }
   };
 
