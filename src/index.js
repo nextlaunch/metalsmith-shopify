@@ -39,6 +39,19 @@ export function assignFilters(config, metalsmith) {
     asset_url: function (str) {
       return `https://cdn.shopify.com/s/files/1/0354/1849/t/2/assets/${str}`;
     },
+    asset_img_url: function (str, size) {
+      let parts;
+      let asset_url;
+      if (str.indexOf('.')) {
+        parts = str.split('.');
+        let s = size[0];
+        let asset_name = parts[0];
+        let ext = parts[1];
+        let asset = [asset_name, s].join('_')
+        asset_url = [asset, ext].join('.');
+      }
+      return `//cdn.shopify.com/s/files/1/0159/3350/products/${asset_url}`;
+    },
     img_tag: function (str, alt) {
       console.log(str, args);
       return `<img src="${str}" alt="alternate text" class="${args}" />`;

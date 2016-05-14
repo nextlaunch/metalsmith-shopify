@@ -108,6 +108,32 @@ describe('URL Filters', () => {
 
   });
 
+  it('should have asset_img_url', (done) => {
+    
+    let str = 'red_shirt.jpg';
+    const args = ['small']
+    let filters;
+    m.use((files, metalsmith, next) => {
+
+        let localePath = path.resolve('test/fixtures/locales');
+        filters = assignFilters({
+          locale: 'en.default.obj',
+          localePath
+        }, metalsmith);
+
+        expect(filters.asset_img_url).to.be.ok;
+        let data = filters.asset_img_url(str, args);
+        expect(data).to.equal('//cdn.shopify.com/s/files/1/0159/3350/products/red_shirt_small.jpg');
+
+        next();
+      })
+      .use(layouts({
+        engine: 'liquid',
+        directory: 'templates'
+      }))
+      .build(done);
+  });
+
   xit('should have img_tag filter', (done) => {
     
     let str = 'red_shirt_small.jpg';
