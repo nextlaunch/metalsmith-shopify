@@ -51,6 +51,9 @@ export function assignFilters(config, metalsmith) {
       }
       return `//cdn.shopify.com/s/files/1/0354/1849/t/2/assets/${asset_url}`;
     },
+    modulo: function (a, b) {
+      return a % b;
+    },
     img_tag: function (str, alt) {
       console.log(str, args);
       return `<img src="${str}" alt="alternate text" class="${args}" />`;

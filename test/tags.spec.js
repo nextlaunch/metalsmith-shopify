@@ -134,6 +134,31 @@ describe('URL Filters', () => {
       .build(done);
   });
 
+  it('should have modulo filter', (done) => {
+    
+    let filters;
+    m.use((files, metalsmith, next) => {
+
+        let localePath = path.resolve('test/fixtures/locales');
+        filters = assignFilters({
+          locale: 'en.default.obj',
+          localePath
+        }, metalsmith);
+
+        expect(filters.modulo).to.be.ok;
+        let data = filters.modulo(4, 2);
+        expect(data).to.equal(0);
+
+        next();
+      })
+      .use(layouts({
+        engine: 'liquid',
+        directory: 'templates'
+      }))
+      .build(done);
+
+  });
+
   xit('should have img_tag filter', (done) => {
     
     let str = 'red_shirt_small.jpg';
