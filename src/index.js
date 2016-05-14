@@ -3,6 +3,7 @@ import _ from 'lodash';
 import q from 'q';
 import path from 'path';
 import fs from 'fs';
+import changeCase from 'change-case';
 import {
   loadShopify,
   shopifyCallList
@@ -68,7 +69,7 @@ export function assignFilters(config, metalsmith) {
 };
 
 // Metalsmith plugin
-export default function (options) {
+export function shopify(options) {
 
   return function (files, metalsmith, next) {
 
@@ -157,9 +158,31 @@ function writeStore(data, cb) {
     JSON.stringify(data), 
     (err) => {
       if (err) throw err;
-      cb(null);
+      cb();
     }
   );
+}
+
+
+export function createObjects() {
+  return function (files, m, next) {
+    try {
+      let data = m.metadata().shopify_data;
+      for (let k in data) {
+        switch(k) {
+          case 'customCollection':
+            m.metadata()['collection'] = data[k];
+          default:
+            let snaked = changeCase.snakeCase(k);
+            m.metadata()[snaked] = data[k];
+        }
+      }
+      next();
+    } catch(e) {
+      throw new Error('shopify_data not found');
+      next();
+    }
+  }
 }
 
 // function assignFiles(files) {

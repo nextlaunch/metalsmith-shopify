@@ -12,7 +12,7 @@ describe('translate tag', () => {
   let m;
   beforeEach(() => {
     // set up a new build
-    m = Metalsmith('test/fixtures');
+    m = Metalsmith('test/fixtures/tags');
   });
 
   it('should accept a string and return the right object from an array object source', (done) => {
@@ -20,7 +20,7 @@ describe('translate tag', () => {
     let filters;
     m.use((files, metalsmith, next) => {
 
-        let localePath = path.resolve('test/fixtures/locales');
+        let localePath = path.resolve('test/fixtures/tags/locales');
         filters = assignFilters({
           locale: 'en.default',
           localePath
@@ -49,7 +49,7 @@ describe('translate tag', () => {
     let filters;
     m.use((files, metalsmith, next) => {
 
-        let localePath = path.resolve('test/fixtures/locales');
+        let localePath = path.resolve('test/fixtures/tags/locales');
         filters = assignFilters({
           locale: 'en.default.obj',
           localePath
@@ -79,7 +79,7 @@ describe('URL Filters', () => {
   let m;
   beforeEach(() => {
     // set up a new build
-    m = Metalsmith('test/fixtures');
+    m = Metalsmith('test/fixtures/tags');
   });
 
   it('should have asset_url filter', (done) => {
@@ -88,7 +88,7 @@ describe('URL Filters', () => {
     let filters;
     m.use((files, metalsmith, next) => {
 
-        let localePath = path.resolve('test/fixtures/locales');
+        let localePath = path.resolve('test/fixtures/tags/locales');
         filters = assignFilters({
           locale: 'en.default.obj',
           localePath
@@ -115,7 +115,7 @@ describe('URL Filters', () => {
     let filters;
     m.use((files, metalsmith, next) => {
 
-        let localePath = path.resolve('test/fixtures/locales');
+        let localePath = path.resolve('test/fixtures/tags/locales');
         filters = assignFilters({
           locale: 'en.default.obj',
           localePath
@@ -139,7 +139,7 @@ describe('URL Filters', () => {
     let filters;
     m.use((files, metalsmith, next) => {
 
-        let localePath = path.resolve('test/fixtures/locales');
+        let localePath = path.resolve('test/fixtures/tags/locales');
         filters = assignFilters({
           locale: 'en.default.obj',
           localePath

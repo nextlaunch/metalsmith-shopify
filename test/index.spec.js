@@ -1,7 +1,7 @@
 import {expect} from 'chai';
 import nock from 'nock';
 import sinon from 'sinon';
-import shopify from '../src';
+import {shopify, createObjects} from '../src';
 import Metalsmith from 'metalsmith';
 import layouts from 'metalsmith-layouts';
 import path from 'path';
@@ -32,6 +32,7 @@ describe("metalsmith-shopify", () => {
   let themeId = 828155753;
   let blogId = 241253187;
   let customerId = 207119551;
+  let productId = 5492648197;
 
   before(() => {
     // remove any cache json files
@@ -61,7 +62,7 @@ describe("metalsmith-shopify", () => {
       mockReq(scope);
       
       // set up a new build
-      m = Metalsmith('test/fixtures')
+      m = Metalsmith('test/fixtures/shopify-data')
           .use(shopify({
             shopName,
             apiKey,
@@ -69,8 +70,10 @@ describe("metalsmith-shopify", () => {
             settingsDataPath: path.resolve(__dirname, 'fixtures/settings_data.json'),
             themeId,
             blogId,
-            customerId
+            customerId,
+            localePath: path.resolve(__dirname, './fixtures/shopify-data/locales')
           }))
+          .use(createObjects())
           .use(layouts({
             engine: 'liquid',
             directory: 'templates'

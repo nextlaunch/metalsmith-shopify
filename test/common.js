@@ -50,4 +50,6 @@ export function mockReq(scope) {
     .reply(200, data.metafield.res.list)
     .get('/admin/orders.json')
     .reply(200, data.order.res.list)
+    .get('/admin/custom_collections.json')
+    .reply(200, data.customCollection.res.list)
 }

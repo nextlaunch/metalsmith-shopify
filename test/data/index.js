@@ -16,3 +16,4 @@ exports.customerAddress = require('./customer-address');
 exports.event = require('./event');
 exports.metafield = require('./metafield');
 exports.order = require('./order');
+exports.customCollection = require('./custom-collection');

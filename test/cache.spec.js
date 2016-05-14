@@ -1,7 +1,7 @@
 import {expect} from 'chai';
 import sinon from 'sinon';
 import nock from 'nock';
-import shopify from '../src';
+import {shopify} from '../src';
 import Metalsmith from 'metalsmith';
 import layouts from 'metalsmith-layouts';
 import path from 'path';
@@ -34,7 +34,7 @@ describe('with no caching', () => {
     
     mockReq(scope);
     
-    m = Metalsmith('test/fixtures')
+    m = Metalsmith('test/fixtures/shopify-data')
       .use(shopify({
         shopName,
         apiKey,
@@ -42,7 +42,8 @@ describe('with no caching', () => {
         themeId,
         blogId,
         customerId,
-        cache: false
+        cache: false,
+        localePath: path.resolve(__dirname, './fixtures/shopify-data/locales')
       }))
       .use(layouts({
         engine: 'liquid',
