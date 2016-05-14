@@ -47,7 +47,7 @@ export function assignFilters(config, metalsmith) {
         let s = size[0];
         let asset_name = parts[0];
         let ext = parts[1];
-        let asset = [asset_name, s].join('_')
+        let asset = [asset_name, s].join('_');
         asset_url = [asset, ext].join('.');
       }
       return `//cdn.shopify.com/s/files/1/0159/3350/products/${asset_url}`;
