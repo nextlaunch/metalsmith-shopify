@@ -37,7 +37,7 @@ export function assignFilters(config, metalsmith) {
       }
     },
     asset_url: function (str) {
-      return `https://cdn.shopify.com/s/files/1/0354/1849/t/2/assets/${str}`;
+      return `//cdn.shopify.com/s/files/1/0354/1849/t/2/assets/${str}`;
     },
     asset_img_url: function (str, size) {
       let parts;
@@ -49,7 +49,7 @@ export function assignFilters(config, metalsmith) {
         let asset = [asset_name, size].join('_');
         asset_url = [asset, ext].join('.');
       }
-      return `//cdn.shopify.com/s/files/1/0159/3350/products/${asset_url}`;
+      return `//cdn.shopify.com/s/files/1/0354/1849/t/2/assets/${asset_url}`;
     },
     img_tag: function (str, alt) {
       console.log(str, args);

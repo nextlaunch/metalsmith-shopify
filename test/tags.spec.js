@@ -96,7 +96,7 @@ describe('URL Filters', () => {
 
         expect(filters.asset_url).to.be.ok;
         let data = filters.asset_url(str);
-        expect(data).to.equal('https://cdn.shopify.com/s/files/1/0354/1849/t/2/assets/timber.scss.css');
+        expect(data).to.equal('//cdn.shopify.com/s/files/1/0354/1849/t/2/assets/timber.scss.css');
 
         next();
       })
@@ -123,7 +123,7 @@ describe('URL Filters', () => {
 
         expect(filters.asset_img_url).to.be.ok;
         let data = filters.asset_img_url(str, args);
-        expect(data).to.equal('//cdn.shopify.com/s/files/1/0159/3350/products/red_shirt_small.jpg');
+        expect(data).to.equal('//cdn.shopify.com/s/files/1/0354/1849/t/2/assets/red_shirt_small.jpg');
 
         next();
       })
