@@ -32,13 +32,29 @@ export function fetchList(resource, file, args) {
 
 export function shopifyCallList(api, endpoints) {
   let calls = [];
+  let collections = [];
   let index = 0;
   for (const resource in endpoints) {
     let { method, params } = endpoints[resource];
-    calls.push(
-      api[resource][method](...params)
-    )
+    // if (resource === 'collect') {
+    //   // for all collects, group data by similar collections, products
+    //   // fetch the single collection data
+    //   // with all products in a collection gathered, map that data to a
+    //   // collectio object
+    //   calls.push(
+    //     api[resource][method](...params)
+    //       .then(resp => {
+    //         return api['customCollection'].get(resp.collection_id)
+    //           .then((foo) => {
+    //             console.log(foo)
+    //           })
+    //       })
+    //   )
+    // } else {
+      calls.push(
+        api[resource][method](...params)
+      );
+    // }
   }
-
   return calls;
 }

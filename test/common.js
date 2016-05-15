@@ -52,4 +52,10 @@ export function mockReq(scope) {
     .reply(200, data.order.res.list)
     .get('/admin/custom_collections.json')
     .reply(200, data.customCollection.res.list)
+    // .get('/admin/custom_collections.json')
+    // .reply(200, data.customCollection.res.get)
+    // .get('/admin/custom_collections/395646240.json')
+    // .reply(200)
+    // .get('/admin/custom_collections/691652237.json')
+    // .reply(200)
 }

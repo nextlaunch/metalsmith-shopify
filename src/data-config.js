@@ -82,7 +82,7 @@ export default function (options) {
     customCollection: {
       method: 'list',
       params: []
-    },
+    }
     // user: {
     //   method: 'list',
     //   params: []
