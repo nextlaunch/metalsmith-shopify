@@ -171,7 +171,11 @@ export function createObjects() {
       for (let k in data) {
         switch(k) {
           case 'customCollection':
-            m.metadata()['collections'] = data[k];
+            let withHandles = data[k].reduce((memo, obj) => {
+              memo[obj.handle] = obj;
+              return memo;
+            }, {});
+            m.metadata()['collections'] = withHandles;
           default:
             let snaked = changeCase.snakeCase(k);
             m.metadata()[snaked] = data[k];
