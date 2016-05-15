@@ -108,7 +108,7 @@ function loadCollections(api, resource, method, params) {
               // get collection
               let collectionData = c[key];
               // assign new collection object with product, collection data
-              memo[key] = {
+              memo[collectionData.handle] = {
                 products,
                 ...collectionData
               }
