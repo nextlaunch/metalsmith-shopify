@@ -145,7 +145,14 @@ function assignMetadata(metalsmith, data, endpoints) {
   } else {
     meta.shopify_data = data.reduce((memo, val, i) => {
       let resource = {};
-      memo[keys[i]] = val;
+      switch(keys[i]) {
+        case 'collect':
+          memo['collections'] = val[0];
+          memo[keys[i]] = val[1];
+          break;
+        default:
+          memo[keys[i]] = val;
+      }
       return memo;
     }, {});
   }

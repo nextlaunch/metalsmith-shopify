@@ -19,6 +19,16 @@
       "updated_at": null,
       "position": 1,
       "sort_value": "0000000001"
+    },
+    {
+      "id": 225422345,
+      "collection_id": 841564295,
+      "product_id": 510110242,
+      "featured": false,
+      "created_at": null,
+      "updated_at": null,
+      "position": 2,
+      "sort_value": "0000000001"
     }
   ]
 }
