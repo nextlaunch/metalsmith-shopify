@@ -1,6 +1,8 @@
 import Shopify from 'shopify-api-node';
 import q from 'q';
 import _ from 'lodash';
+import changeCase from 'change-case';
+import fs from 'fs';
 
 export function loadShopify(options) {
   return new Shopify(options.shopName, options.apiKey, options.password);
@@ -48,6 +50,90 @@ export function shopifyCallList(api, endpoints) {
     }
   }
   return calls;
+}
+
+export function writeStore(data, cb) {
+  fs.writeFile(
+    'shopify_data.json',
+    JSON.stringify(data), 
+    (err) => {
+      if (err) throw err;
+      cb();
+    }
+  );
+}
+
+export function createSassVariables(settings, path = '') {
+  if (!settings) {
+    throw new Error('settings was undefined');
+  }
+  
+  let variables = [];
+  
+  for (let setting in settings) {
+    let camel = _.camelCase(setting);
+    let val = settings[setting];
+
+    if (typeof val === 'function') {
+      val = val();
+    }
+    
+    variables.push(`$${camel}: '${val}';`);
+
+  }
+  return variables.join('\n');
+  // should turn setting into string of sass variable
+  // should write to file with sass variables and return the path
+}
+
+export function createObjects() {
+  return function (files, m, next) {
+    try {
+      let data = m.metadata().shopify_data;
+      for (let k in data) {
+        switch(k) {
+          case 'customCollection':
+            let withHandles = data[k].reduce((memo, obj) => {
+              memo[obj.handle] = obj;
+              return memo;
+            }, {});
+            m.metadata()['collections'] = withHandles;
+          default:
+            let snaked = changeCase.snakeCase(k);
+            m.metadata()[snaked] = data[k];
+        }
+      }
+      next();
+    } catch(e) {
+      throw new Error('shopify_data not found');
+      next();
+    }
+  }
+}
+
+export function assignMetadata(metalsmith, data, endpoints) {
+  let meta = metalsmith.metadata();
+  let keys = Object.keys(endpoints);
+  if (!Array.isArray(data)) {
+    for (const k in data) {
+      if (!meta.shopify_data) meta.shopify_data = {};
+      meta.shopify_data[k] = data[k];
+    }
+  } else {
+    meta.shopify_data = data.reduce((memo, val, i) => {
+      let resource = {};
+      switch(keys[i]) {
+        case 'collect':
+          memo['collections'] = val[0];
+          memo[keys[i]] = val[1];
+          break;
+        default:
+          memo[keys[i]] = val;
+      }
+      return memo;
+    }, {});
+  }
+  return meta;
 }
 
 function loadCollections(api, resource, method, params) {
@@ -119,3 +205,20 @@ function loadCollections(api, resource, method, params) {
     })
     return defer.promise;
 }
+
+// function assignFiles(files) {
+//   files.forEach((filename) => {
+//     var file = files[filename];
+//     var dfd = q.defer();
+      
+//     // file = Object.assign(
+//     //   file,
+//     //   shopifyConfig,
+//     //   {settings: settingsData.current}
+//     // );
+
+//     // file.content_for_layout = file.contents;
+
+
+//   });
+// }
